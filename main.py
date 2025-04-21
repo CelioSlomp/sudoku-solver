@@ -4,6 +4,9 @@ Criar um jogo de Sudoku usando restrições CSP
 '''
 
 def matrizTeste():
+    '''
+    gera uma matriz que vai de 0 a 8 apenas para testar a função de desenhar.
+    '''
     jogo = []
     for i in range(0, 9):
         a = []
@@ -22,6 +25,8 @@ def desenhar(jogo: list):
     .
     [valores da linha 9]
     ]
+
+    e a printa com a coordenada de linha e coluna
     '''
     contador = 1
     print("   ", end="")
@@ -36,11 +41,21 @@ def desenhar(jogo: list):
         contador += 1
 
 def allDiff(linha):
+    '''
+    No trecho que fala do Sudoku ele apresenta o AllDiff, mas acabou que nem foi usado.
+    Talvez no ac3, quando compara os pares daria para utilizar, mas chamando a função
+    toda vez que for comparar pode ser mais demorado.
+    '''
     if len(set(linha)) != 9:
         return False
     return True
 
 def gerarPares():
+    '''
+    gera todos os pares de coordenadas irmãs possíveis.
+    lembrando que: coordenadas irmãs são apenas coordenadas que estão no mesmo bloco,
+    linha e coluna.
+    '''
     pares = {}
     for i in range(0, 9):
         for j in range(0, 9):
@@ -53,6 +68,11 @@ def gerarPares():
     return pares
 
 def gerarDominio(jogo):
+    '''
+    gera o domínio de cada item. Cada item possui um set {1, 2, ..., 9},
+    que são os valores possíveis para aquela casa. Quando o domínio tiver apenas
+    um valor, significa que aquele item possui este único valor.
+    '''
     dominios = {}
     for i in range(0, 9):
         for j in range(0, 9):
@@ -63,12 +83,23 @@ def gerarDominio(jogo):
     return dominios
 
 def completo(dominios):
+    '''
+    caso algum item do domínio tenha mais de um valor, o Sudoku não está completo.
+    '''
     for i in dominios:
         if len(dominios[i]) != 1:
             return False
     return True
 
 def ac3(dominios, pares):
+    '''
+    Segue o pseudocódigo do livro do Russel, comparando as coordenadas irmãs.
+    Este algoritmo consegue determinar o valor de uma formula lógica.
+
+    Dados os conjuntos A = [1,2] e B = [1,2], o algoritmo verifica as possíbilidades e não faz nada,
+    já que ambos podem ter o mesmo valor. Entretanto, caso o conjunto A = [1,2] e B = [1], ele conclui que
+    B é de fato 1 e A = [2], concluindo também que A = 2.
+    '''
     fila = [(xi,xj) for xi in dominios for xj in pares[xi]]
 
     while fila:
@@ -82,6 +113,9 @@ def ac3(dominios, pares):
     return True
 
 def revisao(dominios, xi, xj):
+    '''
+    Aqui faz a parte da verificação e remoção dos conjuntos A e B, citados anteriormente.
+    '''
     revisado = False
     remover = set()
     for i in dominios[xi]:
@@ -107,11 +141,13 @@ def copiaDominios(dominios):
     return {var: set(valores) for var, valores in dominios.items()}
 
 def backtrack(dominios, pares):
+    '''
+    Este algoritmo também segue o pseudocódigo do livro de Russel.
+    Ele testa de forma recursiva todos os valores possíveis que estão dentro do
+    domínio de cada item.
+    '''
     if completo(dominios):
         return dominios
-    
-    #print("--------------------------------------------")
-    # desenhar(tiraValoresNulos(dominios))
 
     var = pegaVariaveisNaoDefinidas(dominios)
     for valor in sorted(dominios[var]):
@@ -124,7 +160,10 @@ def backtrack(dominios, pares):
     return None
 
 def jogoAtualizado(tabela, jogo):
-
+    '''
+    Atualiza o jogo pegando os valores únicos do domínio e coloca o valor no
+    jogo original.
+    '''
     for i in range(0,9):
         for j in range(0,9):
             if len(tabela[i][j]) == 1:
@@ -133,6 +172,10 @@ def jogoAtualizado(tabela, jogo):
     return jogo
 
 def tiraValoresNulos(dominios):
+    '''
+    Cria uma matriz de zeros, caso o conjunto tenha apenas um de tamanho, altera o valor e deixa
+    0 como valor nulo.
+    '''
     jogo = [[0 for _ in range(0, 9)] for _ in range(0,9)]
     for (i, j), valor in dominios.items():
         if len(valor) == 1:
@@ -142,6 +185,9 @@ def tiraValoresNulos(dominios):
     return jogo
 
 def main(jogo):
+    '''
+    Funcao main: testa com o algoritmo AC3 e então executa o backtrack.
+    '''
     dominios = gerarDominio(jogo)
     pares = gerarPares()
 
@@ -171,6 +217,7 @@ if __name__ == "__main__":
         [0, 6, 7, 5, 9, 0, 0, 0, 4]
     ]
 
+    # Supostamente o Sudoku mais dificil do mundo
     sudoku1 = [
         [1, 0, 0, 0, 0, 7, 0, 9, 0],
         [0, 3, 0, 0, 2, 0, 0, 0, 8],
