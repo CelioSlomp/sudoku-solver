@@ -1,2 +1,4 @@
 # Sudoku_IA
-An artificial intelligence that uses search algorithms like AC-3 and backtracking
+
+* This project is based on the book "Artificial Intelligence: A modern Approach Fourth Edition", written by Russel and Norvig.
+
